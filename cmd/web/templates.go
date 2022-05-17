@@ -8,7 +8,9 @@ import (
 	"text/template"
 )
 
-type templateData struct{}
+type templateData struct {
+	FileUri map[string]string
+}
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
@@ -40,6 +42,10 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
 	if td == nil {
 		td = &templateData{}
+	}
+	fileUri, ok := app.session.Pop(r, "fileUri").(map[string]string)
+	if ok {
+		td.FileUri = fileUri
 	}
 
 	return td

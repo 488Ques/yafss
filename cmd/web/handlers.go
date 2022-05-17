@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"io"
 	"net/http"
 	"os"
@@ -87,11 +86,6 @@ func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 		fileUri[header.Filename] = uri
 	}
 
-	jsonBytes, err := json.Marshal(fileUri)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonBytes)
+	app.session.Put(r, "fileUri", fileUri)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

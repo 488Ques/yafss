@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"log"
 	"net/http"
 	"text/template"
@@ -28,6 +29,7 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	gob.Register(map[string]string{})
 	secret := []byte("qTHcP4XqFP/EKwttVFjvuJzHsmPiMoeMrR04uoqQXZ8=")
 	session := sessions.New(secret)
 	session.Lifetime = 1 * time.Hour
