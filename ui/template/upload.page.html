@@ -1,0 +1,13 @@
+{{template "base" .}}
+
+{{define "title"}}Upload{{end}}
+
+{{define "main"}}
+<form enctype="multipart/form-data" action="upload" method="POST">
+    <input id="uploadfile" type="file" name="uploadfile" multiple>
+    <input type="submit" value="upload">
+</form>
+<!-- <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+    <p>Drag one or more files to this Drop Zone ...</p>
+</div> -->
+{{end}}
