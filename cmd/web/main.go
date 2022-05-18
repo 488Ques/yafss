@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 	"time"
 
@@ -20,6 +21,11 @@ type application struct {
 
 func main() {
 	config, err := newConfiguration("./config.json")
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	err = os.MkdirAll(config.FilesDir, 0755)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
