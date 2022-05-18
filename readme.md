@@ -1,6 +1,7 @@
 Simple file sharing web application. Not guaranteed to work in production.
+
 Configuration is in config.json
-```
+``` golang
 type configuration struct {
 	Addr            string   `json:"addr"`            // Address of the web application
 	FilesDir        string   `json:"filesDir"`        // Directory of uploaded files
