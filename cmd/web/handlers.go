@@ -9,10 +9,6 @@ import (
 	"path/filepath"
 )
 
-// TODO Show uploaded files' links
-// TODO List uploaded files in the web UI
-// TODO drag and drop uploading
-
 const MB = 1 << 20
 
 func (app *application) uploadForm(w http.ResponseWriter, r *http.Request) {
