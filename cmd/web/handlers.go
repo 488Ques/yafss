@@ -27,6 +27,7 @@ func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 	var fileUri = make(map[string]string)
 
 	for _, header := range headers {
+		app.infoLog.Printf("File name: %s\n", header.Filename)
 		file, err := header.Open()
 		if err != nil {
 			app.serverError(w, err)
@@ -40,7 +41,7 @@ func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		app.infoLog.Printf("File size: %d byte\n", fileSize)
+		app.infoLog.Printf("File size: %d bytes\n", fileSize)
 		// Check file limit
 		if fileSize > int64(app.config.UploadLimit)*MB {
 			app.clientError(w, http.StatusRequestEntityTooLarge)
