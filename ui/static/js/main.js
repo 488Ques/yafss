@@ -1,8 +1,15 @@
+var fileInput = document.getElementById("fileInput");
+var dropZone = document.getElementById("dropZone");
+
 function dragOverHandler(ev) {
     ev.preventDefault();
+    ev.target.classList.add("dragging");
 }
 
-var fileInput = document.getElementById("fileInput")
+function dragLeaveHandler(ev) {
+    ev.preventDefault();
+    ev.target.classList.remove("dragging");
+}
 
 function dropHandler(ev) {
     ev.preventDefault();
@@ -13,4 +20,5 @@ function dropHandler(ev) {
     }
 
     fileInput.files = dt.files;
+    ev.target.classList.remove("dragging");
 }  

@@ -10,8 +10,9 @@
             <input type="submit" value="upload">
         </form>
 
-        <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-            <p>Drag one or more files to this Drop Zone ...</p>
+        <div id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);"
+            ondragleave="dragLeaveHandler(event);">
+            <p>Or drag and drop here</p>
         </div>
 
         {{with .FileUri}}
