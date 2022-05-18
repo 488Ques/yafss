@@ -1,4 +1,4 @@
-module yafss
+module github.com/488Ques/yafss
 
 go 1.18
 
