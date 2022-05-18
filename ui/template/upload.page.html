@@ -1,21 +1,26 @@
 {{template "base" .}}
 
-{{define "title"}}Upload{{end}}
+{{define "title"}}Yet Another File Sharing Service{{end}}
 
 {{define "main"}}
-<form enctype="multipart/form-data" action="/" method="POST">
-    <input type="file" name="uploadfile" multiple>
-    <input type="submit" value="upload">
-</form>
+<main>
+    <div>
+        <form enctype="multipart/form-data" action="/" method="POST">
+            <input id="fileInput" type="file" name="uploadfile" multiple>
+            <input type="submit" value="upload">
+        </form>
 
-{{with .FileUri}}
-<ul>
-    {{range $file, $uri := .}}
-    <li><a href="/files/{{$uri}}">{{$file}}</a></li>
-    {{end}}
-</ul>
-{{end}}
-<!-- <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-    <p>Drag one or more files to this Drop Zone ...</p>
-</div> -->
+        <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+            <p>Drag one or more files to this Drop Zone ...</p>
+        </div>
+
+        {{with .FileUri}}
+        <ul>
+            {{range $file, $uri := .}}
+            <li><a href="/files/{{$uri}}">{{$file}}</a></li>
+            {{end}}
+        </ul>
+        {{end}}
+    </div>
+</main>
 {{end}}
