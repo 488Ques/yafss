@@ -8,9 +8,7 @@ import (
 	"text/template"
 )
 
-type templateData struct {
-	FileUri map[string]string
-}
+type templateData struct{}
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
@@ -43,15 +41,18 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 	if td == nil {
 		td = &templateData{}
 	}
-	fileUri, ok := app.session.Pop(r, "fileUri").(map[string]string)
-	if ok {
-		td.FileUri = fileUri
-	}
 
 	return td
 }
 
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *templateData) {
+	templateCache, err := newTemplateCache("./ui/template")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.templateCache = templateCache
+
 	ts, ok := app.templateCache[name]
 	if !ok {
 		app.serverError(w, fmt.Errorf("The template %s does not exist", name))
@@ -59,7 +60,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 	}
 
 	buf := &bytes.Buffer{}
-	err := ts.Execute(buf, app.addDefaultData(td, r))
+	err = ts.Execute(buf, app.addDefaultData(td, r))
 	if err != nil {
 		app.serverError(w, err)
 		return

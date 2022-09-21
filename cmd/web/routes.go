@@ -9,12 +9,11 @@ import (
 
 func (app *application) routes() http.Handler {
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
-	dynamicMiddleware := alice.New(app.session.Enable)
 
 	mux := pat.New()
 
-	mux.Get("/", dynamicMiddleware.ThenFunc(app.uploadForm))
-	mux.Post("/", dynamicMiddleware.ThenFunc(app.upload))
+	mux.Get("/", http.HandlerFunc(app.main))
+	mux.Post("/upload", http.HandlerFunc(app.upload))
 
 	filesServer := http.FileServer(http.Dir(app.config.FilesDir))
 	staticServer := http.FileServer(http.Dir("./ui/static/"))

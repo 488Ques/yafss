@@ -3,25 +3,17 @@
 {{define "title"}}Yet Another File Sharing Service{{end}}
 
 {{define "main"}}
-<main>
-    <div>
-        <form enctype="multipart/form-data" action="/" method="POST">
-            <input id="fileInput" type="file" name="uploadfile" multiple>
-            <input type="submit" value="upload">
-        </form>
+<main class="container">
+    <div class="text-primary" id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);"
+        ondragleave="dragLeaveHandler(event);">
+        <input type="file" id="upload" multiple onchange="uploadMultiple();" hidden>
 
-        <div id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);"
-            ondragleave="dragLeaveHandler(event);">
-            <p>Or drag and drop here</p>
-        </div>
-
-        {{with .FileUri}}
-        <ul>
-            {{range $file, $uri := .}}
-            <li><a href="/files/{{$uri}}">{{$file}}</a></li>
-            {{end}}
-        </ul>
-        {{end}}
+        Drag and drop here or <button class="ms-2 btn btn-outline-primary" id="browse" onclick="browseClick();">browse</button>
     </div>
+
+    <!-- TODO Add loading spinner animation -->
+    <!-- TODO Display uploaded file's name while uploading -->
+    <ul id="linksLst" class="list-group mt-4">
+    </ul>
 </main>
 {{end}}

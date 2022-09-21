@@ -1,14 +1,10 @@
 package main
 
 import (
-	"encoding/gob"
 	"log"
 	"net/http"
 	"os"
 	"text/template"
-	"time"
-
-	"github.com/golangcollege/sessions"
 )
 
 type application struct {
@@ -16,7 +12,6 @@ type application struct {
 	infoLog       *log.Logger
 	config        *configuration
 	templateCache map[string]*template.Template
-	session       *sessions.Session
 }
 
 func main() {
@@ -35,17 +30,11 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
-	gob.Register(map[string]string{})
-	secret := []byte("qTHcP4XqFP/EKwttVFjvuJzHsmPiMoeMrR04uoqQXZ8=")
-	session := sessions.New(secret)
-	session.Lifetime = 1 * time.Hour
-
 	app := application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		config:        config,
 		templateCache: templateCache,
-		session:       session,
 	}
 
 	srv := &http.Server{
