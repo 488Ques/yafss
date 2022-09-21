@@ -7,18 +7,19 @@ import (
 	"os"
 )
 
-const MB = 1 << 20
+const MiB = 1 << 20
 
 func (app *application) main(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "upload.page.html", nil)
 }
 
 func (app *application) upload(w http.ResponseWriter, r *http.Request) {
-	// TODO Restrict upload size
+	r.Body = http.MaxBytesReader(w, r.Body, int64(app.config.UploadLimit)*MiB)
+	// TODO Send proper JSON error
 	// TODO Sniff MIME type
 	// TODO Restrict certain MIME types
 
-	err := r.ParseMultipartForm(32 * MB)
+	err := r.ParseMultipartForm(32 * MiB)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -58,6 +59,7 @@ func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 	app.infoLog.Printf("File name: %s\n", header.Filename)
 	app.infoLog.Printf("File size: %d bytes\n", header.Size)
 
+	// TODO Send to client a string of the upload's URI instead of JSON
 	upload := map[string]string{
 		header.Filename: uri,
 	}

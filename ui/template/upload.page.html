@@ -4,6 +4,7 @@
 
 {{define "main"}}
 <main class="container">
+    <!-- TODO Stop user from uploading over maximum limit -->
     <div class="text-primary" id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);"
         ondragleave="dragLeaveHandler(event);">
         <input type="file" id="upload" multiple onchange="uploadMultiple();" hidden>
