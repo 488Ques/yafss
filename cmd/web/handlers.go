@@ -20,6 +20,10 @@ func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseMultipartForm(32 * MiB)
 	if err != nil {
+		if errors.Is(err, &http.MaxBytesError{}) {
+			app.clientError(w, http.StatusRequestEntityTooLarge)
+			return
+		}
 		app.serverError(w, err)
 		return
 	}
