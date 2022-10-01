@@ -46,7 +46,7 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 }
 
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *templateData) {
-	templateCache, err := newTemplateCache("./ui/template")
+	templateCache, err := newTemplateCache("./ui/template") // REMINDER Remove this line in production
 	if err != nil {
 		app.serverError(w, err)
 		return
