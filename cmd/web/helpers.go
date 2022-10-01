@@ -19,6 +19,15 @@ func sha1Sum(src []byte) ([]byte, error) {
 	return hasher.Sum(nil), nil
 }
 
+func exists(str string, strs []string) bool {
+	for _, s := range strs {
+		if str == s {
+			return true
+		}
+	}
+	return false
+}
+
 func (app *application) writeJSON(w http.ResponseWriter, status int, data interface{}, headers http.Header) error {
 	js, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {

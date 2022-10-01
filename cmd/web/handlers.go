@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -16,17 +17,22 @@ func (app *application) main(w http.ResponseWriter, r *http.Request) {
 func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, int64(app.config.UploadLimit)*MiB)
 	// TODO Send proper JSON error
-	// TODO Sniff MIME type
-	// TODO Restrict certain MIME types
 
 	err := r.ParseMultipartForm(32 * MiB)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
+
 	uploaded, header, err := r.FormFile("upload")
 	if err != nil {
 		app.serverError(w, err)
+		return
+	}
+
+	contentType := header.Header.Get("Content-Type")
+	if exists(contentType, app.config.DisallowedTypes) {
+		app.clientError(w, http.StatusUnsupportedMediaType)
 		return
 	}
 
