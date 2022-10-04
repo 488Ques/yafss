@@ -16,7 +16,6 @@ func (app *application) main(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, int64(app.config.UploadLimit)*MiB)
-	// TODO Send proper JSON error
 
 	err := r.ParseMultipartForm(32 * MiB)
 	if err != nil {
@@ -54,8 +53,8 @@ func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 	}
 	name := base64.URLEncoding.EncodeToString(sum[:8])
 
-	uri := app.config.FilesDir + name
-	file, err := os.OpenFile(uri, os.O_WRONLY|os.O_CREATE, 0666) // Make a write-only file if not exists
+	url := app.config.FilesDir + name
+	file, err := os.OpenFile(url, os.O_WRONLY|os.O_CREATE, 0666) // Make a write-only file if not exists
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -69,13 +68,5 @@ func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 	app.infoLog.Printf("File name: %s\n", header.Filename)
 	app.infoLog.Printf("File size: %d bytes\n", header.Size)
 
-	// TODO Send to client a string of the upload's URI instead of JSON
-	upload := map[string]string{
-		header.Filename: uri,
-	}
-
-	err = app.writeJSON(w, http.StatusOK, upload, nil)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	w.Write([]byte(url))
 }

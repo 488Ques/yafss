@@ -1,3 +1,5 @@
+"use strict";
+
 function dragOverHandler(ev) {
     ev.preventDefault();
     ev.target.classList.add("dragging");
@@ -29,6 +31,11 @@ function browseClick() {
     input.click();
 }
 
+/**
+ * Upload one file, grab the file name and its URL on the file server
+ * and add it to the DOM
+ * @param {File} up 
+ */
 function upload(up) {
     const fd = new FormData();
     fd.set("upload", up)
@@ -38,27 +45,29 @@ function upload(up) {
     };
 
     fetch("/upload", options)
-        .then(resp => resp.json())
-        .then(data => {
-            var linksLst = document.getElementById("linksLst");
-            for (var fileName in data) {
-                var a = document.createElement("a");
-                a.setAttribute("href", data[fileName]);
-                a.setAttribute("target", "_blank");
-                a.textContent = fileName
+        .then(resp => resp.text())
+        .then(uri => {
+            let linksLst = document.getElementById("linksLst");
 
-                var li = document.createElement("li");
-                li.className = "list-group-item";
+            let a = document.createElement("a");
+            a.setAttribute("href", uri);
+            a.setAttribute("target", "_blank");
+            a.textContent = up.name;
 
-                li.appendChild(a);
-                linksLst.appendChild(li);
-            }
+            let li = document.createElement("li");
+            li.className = "list-group-item";
+
+            li.appendChild(a);
+            linksLst.appendChild(li);
         })
 }
 
+/**
+ * Upload multiple files by calling upload() on each file of input
+ */
 function uploadMultiple() {
     const input = document.getElementById('upload');
-    var ups = input.files;
+    let ups = input.files;
     for (let i = 0; i < ups.length; i++) {
         upload(ups[i]);
     }
