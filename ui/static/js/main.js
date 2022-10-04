@@ -15,8 +15,8 @@ function dropHandler(ev) {
 
     const input = document.getElementById('upload');
 
-    var dt = new DataTransfer();
-    for (var i = 0; i < ev.dataTransfer.files.length; i++) {
+    let dt = new DataTransfer();
+    for (let i = 0; i < ev.dataTransfer.files.length; i++) {
         dt.items.add(ev.dataTransfer.files[i]);
     }
 

@@ -3,14 +3,19 @@
 {{define "title"}}Yet Another File Sharing Service{{end}}
 
 {{define "main"}}
-<main class="container">
+<main class="container mt-4">
     <!-- TODO Stop user from uploading over maximum limit -->
     <!-- TODO Notify users of uploading forbidden file type -->
+    <div class="text-center">Maximum upload size is
+        <span class="fw-bold font-monospace text-info">{{ .UploadLimit }}</span>
+        mebibytes
+    </div>
     <div class="text-primary" id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);"
         ondragleave="dragLeaveHandler(event);">
         <input type="file" id="upload" multiple onchange="uploadMultiple();" hidden>
 
-        Drag and drop here or <button class="ms-2 btn btn-outline-primary" id="browse" onclick="browseClick();">browse</button>
+        Drag and drop here or <button class="ms-2 btn btn-outline-primary" id="browse"
+            onclick="browseClick();">browse</button>
     </div>
 
     <!-- TODO Add loading spinner animation -->

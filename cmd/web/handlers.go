@@ -11,7 +11,7 @@ import (
 const MiB = 1 << 20
 
 func (app *application) main(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, "upload.page.html", nil)
+	app.render(w, r, "upload.page.html", &templateData{UploadLimit: app.config.UploadLimit})
 }
 
 func (app *application) upload(w http.ResponseWriter, r *http.Request) {

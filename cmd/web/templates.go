@@ -8,7 +8,9 @@ import (
 	"text/template"
 )
 
-type templateData struct{}
+type templateData struct {
+	UploadLimit int
+}
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
@@ -37,14 +39,6 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	return cache, nil
 }
 
-func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
-	if td == nil {
-		td = &templateData{}
-	}
-
-	return td
-}
-
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *templateData) {
 	// REMINDER Remove this block in production
 	templateCache, err := newTemplateCache("./ui/template")
@@ -62,7 +56,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 	}
 
 	buf := &bytes.Buffer{}
-	err = ts.Execute(buf, app.addDefaultData(td, r))
+	err = ts.Execute(buf, td)
 	if err != nil {
 		app.serverError(w, err)
 		return
