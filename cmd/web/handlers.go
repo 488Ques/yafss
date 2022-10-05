@@ -49,6 +49,8 @@ func (app *application) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO Maybe sniffing MIME type rather than checking Content-Type
+	// which can be edited on client side
 	contentType := header.Header.Get("Content-Type")
 	if exists(contentType, app.config.DisallowedTypes) {
 		app.clientError(w, http.StatusUnsupportedMediaType)
