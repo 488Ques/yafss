@@ -1,7 +1,7 @@
 {
-    "addr" : ":8080",
+    "addr" : "localhost:8080",
     "filesDir" : "./files/",
-    "uploadLimit" : 4000,
+    "uploadLimit" : 256,
     "disallowedTypes": [
         "application/octet-stream"
     ]

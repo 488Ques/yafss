@@ -1,5 +1,12 @@
-var fileInput = document.getElementById("fileInput");
-var dropZone = document.getElementById("dropZone");
+"use strict";
+
+const MiB = 1 << 20;
+const HTTP_STATUS_OK = 200;
+const HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE = 413;
+const HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE = 415;
+const config = fetch("/config")
+    .then(resp => resp.json())
+    .then(data => data);
 
 function dragOverHandler(ev) {
     ev.preventDefault();
@@ -14,11 +21,126 @@ function dragLeaveHandler(ev) {
 function dropHandler(ev) {
     ev.preventDefault();
 
-    var dt = new DataTransfer();
-    for (var i = 0; i < ev.dataTransfer.files.length; i++) {
+    const input = document.getElementById('upload');
+
+    let dt = new DataTransfer();
+    for (let i = 0; i < ev.dataTransfer.files.length; i++) {
         dt.items.add(ev.dataTransfer.files[i]);
     }
 
-    fileInput.files = dt.files;
+    input.files = dt.files;
     ev.target.classList.remove("dragging");
-}  
+
+    uploadMultiple();
+}
+
+function browseClick() {
+    const input = document.getElementById('upload');
+    input.click();
+}
+
+/**
+ * Upload one file and return its URL on the file server
+ * @param {File} up 
+ * @returns {Promise<string>}
+ */
+async function upload(up) {
+    const fd = new FormData();
+    fd.set("upload", up)
+    const options = {
+        method: "POST",
+        body: fd,
+    };
+
+    const resp = await fetch("/upload", options);
+    const httpStatus = resp.status;
+    if (httpStatus != HTTP_STATUS_OK) {
+        throw httpStatus;
+    }
+    const url = await resp.text();
+    return url;
+}
+
+/**
+ * Upload multiple files by calling upload() on each file of input,
+ * then grab the file name and its URL on the file server and add 
+ * it to the DOM
+ */
+async function uploadMultiple() {
+    const input = document.getElementById("upload");
+    const uploadLimit = (await config).uploadLimit;
+    const disallowedTypes = (await config).disallowedTypes;
+
+    let ups = input.files;
+    // TODO Maybe uploading concurrently?
+    for (let i = 0; i < ups.length; i++) {
+        let up = ups[i];
+
+        // Sanity check
+        if (up.size / MiB > uploadLimit) { // Convert size from byte to MiB
+            displayUploadedURL(null, up.name, "File size exceeds limit!");
+            continue;
+        }
+        if (disallowedTypes.includes(up.type)) {
+            displayUploadedURL(null, up.name, `Disallowed file type: ${up.type}`);
+            continue;
+        }
+
+        let url;
+        try {
+            url = await upload(up);
+        } catch (err) {
+            switch (err) {
+                case HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE:
+                    displayUploadedURL(null, up.name, "File size exceeds limit!");
+                    break;
+                case HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE:
+                    displayUploadedURL(null, up.name, `Disallowed file type: ${up.type}`);
+                    break;
+                default:
+                    displayUploadedURL(null, up.name, `Unexpected error. HTTP code: ${err}`);
+            }
+            continue;
+        }
+
+        displayUploadedURL(url, up.name, null);
+    }
+
+    input.value = null;
+}
+
+/**
+ * Add file name and its URL (if exists) on file server to the DOM,
+ * and show a small info message (if exists)
+ * @param {?string} url
+ * @param {string} fileName 
+ * @param {?string} msg
+ */
+function displayUploadedURL(url, fileName, msg) {
+    const linksLst = document.getElementById("linksList");
+
+    let listItem = document.createElement("li");
+    listItem.classList.add("list-group-item");
+    listItem.textContent = fileName;
+
+    if (url !== null) {
+        let fileURL = document.createElement("a");
+        fileURL.setAttribute("href", url);
+        fileURL.setAttribute("target", "_blank");
+        fileURL.textContent = fileName;
+
+        listItem.textContent = null;
+        listItem.appendChild(fileURL);
+    }
+
+    if (msg !== null) {
+        let alert = document.createElement("div");
+        alert.classList.add("text-danger");
+        alert.classList.add("fw-bold");
+        alert.textContent = msg;
+
+        listItem.appendChild(alert);
+    }
+
+    linksLst.appendChild(listItem);
+}
