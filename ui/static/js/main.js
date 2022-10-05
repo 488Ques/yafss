@@ -1,6 +1,8 @@
 "use strict";
 
 const MiB = 1 << 20;
+const HTTP_STATUS_OK = 200;
+const HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE = 413;
 const config = fetch("/config")
     .then(resp => resp.json())
     .then(data => data);
@@ -51,7 +53,10 @@ async function upload(up) {
 
     // TODO Handle all possible HTTP codes
     const resp = await fetch("/upload", options);
-    const code = resp.status;
+    const httpStatus = resp.status;
+    if (httpStatus != HTTP_STATUS_OK) {
+        throw httpStatus;
+    }
     const url = await resp.text();
     return url;
 }
@@ -75,7 +80,19 @@ async function uploadMultiple() {
             continue;
         }
 
-        let url = await upload(up);
+        let url;
+        try {
+            url = await upload(up);
+        } catch (err) {
+            switch (err) {
+                case HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE:
+                    displayUploadedURL(null, up.name, "File size exceeds limit!");
+                    break;
+                default:
+                    displayUploadedURL(null, up.name, `Unexpected error. HTTP code: ${err}`);
+            }
+            continue;
+        }
 
         displayUploadedURL(url, up.name, null);
     }
@@ -85,7 +102,7 @@ async function uploadMultiple() {
 
 /**
  * Add file name and its URL (if exists) on file server to the DOM,
- * and show msg along with it
+ * and show a small info message (if exists)
  * @param {?string} url
  * @param {string} fileName 
  * @param {?string} msg
