@@ -10,8 +10,23 @@ import (
 
 const MiB = 1 << 20
 
-func (app *application) main(w http.ResponseWriter, r *http.Request) {
+func (app *application) uploadPage(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "upload.page.html", &templateData{UploadLimit: app.config.UploadLimit})
+}
+
+func (app *application) getConfig(w http.ResponseWriter, r *http.Request) {
+	config := struct {
+		UploadLimit     int      `json:"uploadLimit"`
+		DisallowedTypes []string `json:"disallowedTypes"`
+	}{
+		app.config.UploadLimit,
+		app.config.DisallowedTypes,
+	}
+
+	err := app.writeJSON(w, http.StatusOK, config, nil)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
 
 func (app *application) upload(w http.ResponseWriter, r *http.Request) {

@@ -4,12 +4,12 @@
 
 {{define "main"}}
 <main class="container mt-4">
-    <!-- TODO Stop user from uploading over maximum limit -->
     <!-- TODO Notify users of uploading forbidden file type -->
     <div class="text-center">Maximum upload size is
         <span class="fw-bold font-monospace text-info">{{ .UploadLimit }}</span>
         mebibytes
     </div>
+
     <div class="text-primary" id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);"
         ondragleave="dragLeaveHandler(event);">
         <input type="file" id="upload" multiple onchange="uploadMultiple();" hidden>
@@ -20,7 +20,7 @@
 
     <!-- TODO Add loading spinner animation -->
     <!-- TODO Display uploaded file's name while uploading -->
-    <ul id="linksLst" class="list-group mt-4">
+    <ul id="linksList" class="list-group mt-4">
     </ul>
 </main>
 {{end}}
