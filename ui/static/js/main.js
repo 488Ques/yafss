@@ -3,6 +3,7 @@
 const MiB = 1 << 20;
 const HTTP_STATUS_OK = 200;
 const HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE = 413;
+const HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE = 415;
 const config = fetch("/config")
     .then(resp => resp.json())
     .then(data => data);
@@ -51,7 +52,6 @@ async function upload(up) {
         body: fd,
     };
 
-    // TODO Handle all possible HTTP codes
     const resp = await fetch("/upload", options);
     const httpStatus = resp.status;
     if (httpStatus != HTTP_STATUS_OK) {
@@ -69,14 +69,20 @@ async function upload(up) {
 async function uploadMultiple() {
     const input = document.getElementById("upload");
     const uploadLimit = (await config).uploadLimit;
+    const disallowedTypes = (await config).disallowedTypes;
 
     let ups = input.files;
     // TODO Maybe uploading concurrently?
     for (let i = 0; i < ups.length; i++) {
         let up = ups[i];
 
+        // Sanity check
         if (up.size / MiB > uploadLimit) { // Convert size from byte to MiB
             displayUploadedURL(null, up.name, "File size exceeds limit!");
+            continue;
+        }
+        if (disallowedTypes.includes(up.type)) {
+            displayUploadedURL(null, up.name, `Disallowed file type: ${up.type}`);
             continue;
         }
 
@@ -87,6 +93,9 @@ async function uploadMultiple() {
             switch (err) {
                 case HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE:
                     displayUploadedURL(null, up.name, "File size exceeds limit!");
+                    break;
+                case HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE:
+                    displayUploadedURL(null, up.name, `Disallowed file type: ${up.type}`);
                     break;
                 default:
                     displayUploadedURL(null, up.name, `Unexpected error. HTTP code: ${err}`);
